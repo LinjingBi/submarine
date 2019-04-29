@@ -106,3 +106,23 @@ LIMIT_FIELD_NAME = {'GetAllTags', 'GetArticles', 'GetArticle'}
 # 设置token失效 缓冲区
 TOKEN_EXPIRE_DELAY = timedelta(seconds=60)
 ```
+## 配置生效，只要改动settings.py就要执行
+```
+python manage.py migrate
+```
+## 迁移数据库，只要改动models.py就要执行
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+## 在项目根目录下初始化数据库数据
+```
+python init_db.py
+```
+## 运行
+```
+python manage.py runserver <ip>:<port>
+## 项目根目录下，定时/手动同步redis中的点赞信息到mysql
+```
+python sync_redis_mysql.py
+```
