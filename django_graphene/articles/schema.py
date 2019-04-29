@@ -174,7 +174,7 @@ class CreateArticle(graphene.Mutation):
             con = get_redis_connection()
             # 一个用户一个草稿箱
             draft_redis = 'draft_box_{}'.format(writer.id)
-            new_id = time.mktime(time.gmtime(exp))
+            new_id = time.mktime(time.gmtime(time.time()))
             draft = [content, title]
             # {value: score}
             con.zadd(draft_redis, {pickle.dumps(draft): new_id})
