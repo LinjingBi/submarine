@@ -25,10 +25,6 @@ mutation register($username:String!, $password:String!, $email:String!){
   "email": xxxx
 }
 ```
-请将注册返回的token，或Insomnia返回的响应header中set-cookie一栏，或cookie中，复制出token，并新建/添加在请求头部的Authorization一栏，如下所示
-```
-Authorization    JWT <token>   // 以JWT开头，空格隔开
-```
 ## 用户登陆 LogIn
 使用[init_db.py](https://github.com/LinjingBi/submarine/blob/master/django_graphene/init_db.py)预设的用户，或自行注册的用户登陆。
 ```
@@ -44,7 +40,6 @@ mutation login($username:String!, $password:String!){
   "password": xxxx,
 }
 ```
-请将返回的token，或Insomnia返回的响应header中set-cookie一栏，或cookie中，复制出token，并新建/添加在请求头部的Authorization一栏。
 ## 退出登陆 LogOut
 退出登录后，仍旧使用以前的token发送请求，将会收到401 zombie...。
 ```
@@ -54,7 +49,6 @@ mutation logout{
   }
 }
 ```
-**以下的接口测试全部需要登陆验证，请确保正确设置Authorization。以下的接口每次访问都会将refresh token放置在响应的set-cookie中（以jwt=开头），请及时更新请求头部的token。**
 ## 获取文章列表（按照点赞次数排序，relay风格） GetArticles
 **建议保存id，方便后面接口使用**
 ```
@@ -139,6 +133,68 @@ query get($articleId:String!){
   "articleId": <id_from_GetArticles>
 }
 ```
+## 点赞 UpVote
+**注意**
+- 一篇文章一个用户只能点赞一次，不可取消
+```
+mutation vote($articleId:String!){
+  UpVote(articleId:$articleId){
+    ok
+  }
+}
+
+// query variables
+
+{
+  "articleId": <id_from_GetArticles>
+}
+```
+## 创建文章/保存草稿/发布草稿成为文章 CreateArticle
+**入参说明**
+- create_draft：boolean，为True表示该文章要保存到草稿箱，默认为False。
+- draft_id：String，草稿id，来自GetDrafts接口，默认为None。
+- title：String，文章标题
+- content：String， 文章内容
+### 创建文章模式
+```
+mutation create($title:String!, $content:String!){
+  CreateArticle(title:$title, content:$content){
+    newArticle{
+      title,
+      content,
+      createDate,
+      lastModified,
+      postedBy{
+        username
+      }
+    }
+  }
+}
+
+// query variables
+
+{
+  "title": "XXXXX",
+  "content": "XXXXXXXXXXXX"
+}
+```
+### 保存草稿模式
+```
+mutation create($title:String!, $content:String!){
+  CreateArticle(title:$title, content:$content, createDraft: true){
+    ok
+  }
+}
+
+// query variables
+
+{
+  "title": "XXXXX",
+  "content": "XXXXXXXXXXXX"
+}
+```
+### 发布草稿模式
+
 
 
 
