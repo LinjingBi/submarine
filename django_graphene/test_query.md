@@ -206,7 +206,7 @@ mutation create($title:String!, $content:String!, $draftId:String!){
 {
   "title": "XXXXX",
   "content": "XXXXXXXXXXXX",
-  "draftId": <id_from_GetDrafts>
+  "draftId": <id_from_GetDrafts>,
 }
 ```
 ## 获取草稿箱列表 GetDrafts
