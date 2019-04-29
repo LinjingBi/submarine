@@ -48,7 +48,8 @@ mutation logout{
   }
 }
 ```
-# 以下的接口测试全部需要登陆验证，请确保正确设置Authorization。以下的接口每次访问都会将refresh token放置在response的set-cookie中（以jwt=开头），请及时更新请求头部的token。
+**以下的接口测试全部需要登陆验证，请确保正确设置Authorization。以下的接口每次访问都会将refresh token放置在响应的set-cookie中（以jwt=开头），请及时更新请求头部的token。**
+## 
 
 
 
