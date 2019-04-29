@@ -1,7 +1,12 @@
-## 安装Insomnia
-- [下载链接](https://insomnia.rest/)
-- [使用教程](https://support.insomnia.rest/article/61-graphql)  
-安装完毕后，使用Insomnia生成graphql请求，进行接口测试。
+## 采用[django-graphql-jwt](https://django-graphql-jwt.domake.io/en/stable/quickstart.html)进行身份验证
+因为使用[jwt_cookie](https://django-graphql-jwt.domake.io/en/stable/authentication.html#per-cookie)将token存在响应头部的set-cookie中，
+所以可以直接使用GraphiQL进行调试。
+## 使用GraphiQL进行接口测试
+执行了python manage.py runserver语句后，在浏览器输入url
+```
+http://<web_server_ip>:<port_id>/graphql/
+```
+进入GraphQL界面，输入相关query进行测试。
 ## 用户注册 CreateUser
 ```
 mutation register($username:String!, $password:String!, $email:String!){
@@ -51,6 +56,7 @@ mutation logout{
 ```
 **以下的接口测试全部需要登陆验证，请确保正确设置Authorization。以下的接口每次访问都会将refresh token放置在响应的set-cookie中（以jwt=开头），请及时更新请求头部的token。**
 ## 获取文章列表（按照点赞次数排序，relay风格） GetArticles
+**建议保存id，方便后面接口使用**
 ```
 query{
   GetArticles(first: xx, last: xx, after: xx, before: xx){
@@ -76,9 +82,64 @@ query{
 }
 ```
 ## 获取全部tag GetAllTags
+**建议保存id，方便后面接口使用**
 ```
+query{
+GetAllTags{
+  id,
+  name
+}
+}
 
 ```
+## 为文章添加tag AddTag
+**注意**
+- 默认一个文章可以有多个tag
+- 只有文章的作者可以给文章添加tag
+- 同一个tag一篇文章只能添加一次
+- 如果添加叫NO TAG的标签，之前的标签（如果有）全部删除
+```
+mutation add($articleId:String!, $tagId:String!){
+  AddTag(articleId: $articleId, tagId: $tagId){
+    ok
+  }
+}
+
+// query variables
+
+{
+  "articleId": <id_from_GetArticles>,
+  "tagId": <id_from_GetAllTags>
+}
+
+```
+## 获取单个文章详情 GetArticle
+```
+query get($articleId:String!){
+  GetArticle(articleId:$articleId){
+    body{
+      id,
+      title,
+      content,
+      lastModified,
+      createDate,
+      postedBy{
+        username
+      }
+    }
+    tags{
+      name
+    }
+    likes
+  } 
+}
+
+// query variables
+{
+  "articleId": <id_from_GetArticles>
+}
+```
+
 
 
 
