@@ -57,9 +57,7 @@ class RefreshTokenMiddleware(MiddlewareMixin):
         return payload, refresh_token
 
     def process_request(self, request):
-        jwt_header = django_settings.GRAPHQL_JWT['JWT_AUTH_HEADER_NAME']
-        temp = request.META.get(jwt_header, '').split()
-        token = temp[1] if len(temp) == 2 and temp[0] == jwt_settings.JWT_AUTH_HEADER_PREFIX else None
+        token = request.COOKIES.get('JWT')
         if token:
             payload = self.get_payload(token)
             exp = payload['exp']
@@ -103,12 +101,17 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                             con.zadd(token_set, {refresh_token: new_exp})
                             alive = django_settings.GRAPHQL_JWT['JWT_EXPIRATION_DELTA'] + django_settings.TOKEN_EXPIRE_DELAY
                             con.expire(token_set, alive)
-                            new_token = '{} {}'.format(temp[1], refresh_token)
-                            request.META[jwt_header] = new_token
+                            # new_token = '{} {}'.format(temp[1], refresh_token)
+                            request.COOKIES['JWT'] = refresh_token
                             setattr(request, 'jwt', refresh_token)
                         # 如果最新的token也过期了，删token缓存，再交给后面的graphql_jwt中间件返回错误
                         except exceptions.JSONWebTokenError:
                             con.zremrangebyrank(token_set, 0, -1)
+
+    def process_response(self, request, response):
+        if hasattr(request, 'logout'):
+            response.delete_cookie('JWT')
+        return response
 
 
 
