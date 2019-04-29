@@ -194,8 +194,31 @@ mutation create($title:String!, $content:String!){
 }
 ```
 ### 发布草稿模式
+```
+mutation create($title:String!, $content:String!, $draftId:String!){
+  CreateArticle(title:$title, content:$content, createDraft: true, draftId: $draftId){
+    ok
+  }
+}
 
+// query variables
 
+{
+  "title": "XXXXX",
+  "content": "XXXXXXXXXXXX",
+  "draftId": <id_from_GetDrafts>
+}
+```
+## 获取草稿箱列表 GetDrafts
+```
+query{
+  GetDrafts{
+    id,
+    title,
+    content
+  }
+}
+```
 
 
 
