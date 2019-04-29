@@ -67,7 +67,7 @@ class AddTag(graphene.Mutation):
         tag_object = test_tag(cn, tg_id)
 
         # 一篇文章只能有一个tag
-        if tag_object.id in group_object[1]:
+        if tag_object in group_object[1]:
             raise Exception('Tag has been added')
 
         # article_id, tag_id全都合格后，先删掉缓存，然后修改mysql，再同步到redis
@@ -93,8 +93,9 @@ class AddTag(graphene.Mutation):
                 return AddTag(ok=ok)
         except IntegrityError:
             # 已经进行过一次重复添加测试，如果还是出现integrity error，说明mysql写入新数据，要重新读取
-            new_tags = ArticleTag.objects.filter(article_id=art_id)
-            cn.set(article_redis, pickle.dumps([group_object[0], new_tags]))
+            new_tags = ArticleTag.objects.select_related('tag').filter(article_id=art_id)
+            group_object[1] = {item.tag for item in new_tags}
+            cn.set(article_redis, pickle.dumps(group_object))
             cn.expire(article_redis, 60 * 30)
             raise Exception('Tag has been added')
 
