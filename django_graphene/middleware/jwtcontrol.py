@@ -101,7 +101,6 @@ class RefreshTokenMiddleware(MiddlewareMixin):
                             con.zadd(token_set, {refresh_token: new_exp})
                             alive = django_settings.GRAPHQL_JWT['JWT_EXPIRATION_DELTA'] + django_settings.TOKEN_EXPIRE_DELAY
                             con.expire(token_set, alive)
-                            # new_token = '{} {}'.format(temp[1], refresh_token)
                             request.COOKIES['JWT'] = refresh_token
                             setattr(request, 'jwt', refresh_token)
                         # 如果最新的token也过期了，删token缓存，再交给后面的graphql_jwt中间件返回错误
