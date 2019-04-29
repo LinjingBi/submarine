@@ -122,6 +122,7 @@ python init_db.py
 ## 运行
 ```
 python manage.py runserver <ip>:<port>
+```
 ## 项目根目录下，定时/手动同步redis中的点赞信息到mysql
 ```
 python sync_redis_mysql.py
