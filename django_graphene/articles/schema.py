@@ -156,7 +156,9 @@ class CreateArticle(graphene.Mutation):
             con = get_redis_connection()
             if draft_id is not None:
                 draft_redis = 'draft_box_{}'.format(writer.id)
-                con.zremrangebyscore(draft_redis, float(draft_id), float(draft_id))
+                done = con.zremrangebyscore(draft_redis, float(draft_id), float(draft_id))
+                if not done:
+                    raise Exception('invalid draft id')
             try:
                 with transaction.atomic():
                     atc = Article(posted_by=writer, title=title, content=content)
